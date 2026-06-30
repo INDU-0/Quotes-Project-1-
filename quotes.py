@@ -28,8 +28,9 @@ def sign_up():
         s=requests.post(url+"/auth/signup", json=body1)
 
         if s.status_code>=400:
-            print("The Dev Is A Dumbass Twin 🤞")
+            print("Sign Up Not Successful")
             print(s.text)
+            return None, None
         else:
             print("Sign Up Successful 😊")
         
@@ -88,8 +89,13 @@ def post_quote(tkn,usernam):
     }
     dat=requests.post(url+"/quotes/post", json= body3, headers= autho)
     p=dat.json()
-    id1=p["id"]
-    return id1, usernam, quote
+    if dat.status_code>=400:
+        print("Quote Not Published")
+        return None,None,None
+    else:
+        id1=p["id"]
+        print("Quote Posted")
+        return id1, usernam, quote
 
 def store_id(id1,author,quote):
     with open("ids.txt", "a") as f:
@@ -128,6 +134,7 @@ def delete_quote(author):
 
         if jim.status_code>=400:
             print(jim.text)
+            return
         else:
             print("Quote Successfully Deleted 👍")
 
@@ -139,17 +146,22 @@ def delete_quote(author):
     except FileNotFoundError:
         print()
         print("No Quotes Stored")
+        return
 
 def show_all_quotes():
     d=requests.get(url+"/quotes/all")
     quotes1=d.json()
-    k=quotes1["quotes"]
-    c=1 
-    print()
-    for k1 in k:
-        print(f" {c}.{k1["quote"]}")
-        c+=1
-    print()
+    if d.status_code>=400:
+        print("Error Getting Quotes")
+        return
+    else:
+        k=quotes1["quotes"]
+        c=1 
+        print()
+        for k1 in k:
+            print(f" {c}.{k1["quote"]}")
+            c+=1
+        print()
 
 def quotes_username():
     na=input("Enter The Name Of The Author: ")
@@ -157,7 +169,7 @@ def quotes_username():
     fl=mn.json()
     if mn.status_code>=400:
         print("The Author Doesn't Exist")
-        exit()
+        return
     else:
         fla=fl["quotes"]
         print("Quotes From The Author: ")
