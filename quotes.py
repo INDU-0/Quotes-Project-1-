@@ -60,9 +60,16 @@ def sign_in():
         }
         g= requests.post(url+"/auth/signin", json=body2)
         sap=g.json()
-        tkn = sap["token"]
-        print("Sign In Successful 💖")
-        return tkn, usernam
+
+        if g.status_code>=400:
+            print("User Not Found")
+            exit()
+            return None,None
+        else:
+            tkn = sap["token"]
+            print("Sign In Successful 💖")
+            return tkn, usernam
+        
     except KeyError as e:
         print(e)
         return None, None
@@ -148,10 +155,14 @@ def quotes_username():
     na=input("Enter The Name Of The Author: ")
     mn=requests.get(url+f"/quotes/{na}")
     fl=mn.json()
-    fla=fl["quotes"]
-    print("Quotes From The Author: ")
-    for fin in fla:
-        print(f"{fin['quote']}\n")
+    if mn.status_code>=400:
+        print("The Author Doesn't Exist")
+        exit()
+    else:
+        fla=fl["quotes"]
+        print("Quotes From The Author: ")
+        for fin in fla:
+            print(f"{fin['quote']}\n")
 
 
 def main():
